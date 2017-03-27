@@ -4,15 +4,15 @@
 /* global it: false */
 /* global describe: false */
 
-var parseTree = require("../src/parseTree");
-var Settings = require("../src/Settings");
+const parseTree = require("../src/parseTree");
+const Settings = require("../src/Settings");
 
-var defaultSettings = new Settings({});
+const defaultSettings = new Settings({});
 
 beforeEach(function() {
     jasmine.addMatchers({
         toFailWithParseError: function(util, customEqualityTesters) {
-            var prefix = "KaTeX parse error: ";
+            const prefix = "KaTeX parse error: ";
             return {
                 compare: function(actual, expected) {
                     try {
@@ -28,8 +28,8 @@ beforeEach(function() {
                                 message: "'" + actual + "' parsed with error",
                             };
                         }
-                        var msg = e.message;
-                        var exp = prefix + expected;
+                        const msg = e.message;
+                        const exp = prefix + expected;
                         if (msg === exp) {
                             return {
                                 pass: true,
@@ -105,6 +105,16 @@ describe("Parser:", function() {
                    "Double superscript at position 4: 1^2^̲3");
             expect("1^{2+3}_4^5").toFailWithParseError(
                    "Double superscript at position 10: 1^{2+3}_4^̲5");
+        });
+        it("rejects double superscripts involving primes", function() {
+            expect("1'_2^3").toFailWithParseError(
+                   "Double superscript at position 5: 1'_2^̲3");
+            expect("1^2'").toFailWithParseError(
+                   "Double superscript at position 4: 1^2'̲");
+            expect("1^2_3'").toFailWithParseError(
+                   "Double superscript at position 6: 1^2_3'̲");
+            expect("1'_2'").toFailWithParseError(
+                   "Double superscript at position 5: 1'_2'̲");
         });
         it("rejects double subscripts", function() {
             expect("1_2_3").toFailWithParseError(
@@ -220,7 +230,7 @@ describe("Parser.expect calls:", function() {
         });
         it("complains about missing { for size", function() {
             expect("\\rule{1em}[2em]").toFailWithParseError(
-                   "Expected '{', got '[' at position 11: \\rule{1em}[̲2em]");
+                   "Invalid size: '[' at position 11: \\rule{1em}[̲2em]");
         });
         // Can't test for the [ of an optional group since it's optional
         it("complains about missing } for color", function() {
